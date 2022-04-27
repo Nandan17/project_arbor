@@ -1,3 +1,6 @@
+import 'package:arbor/views/home/admin_view.dart';
+import 'package:arbor/views/home/master_view.dart';
+import 'package:arbor/views/home/public_view.dart';
 import 'package:arbor/views/login_view.dart';
 import 'package:arbor/views/register_view.dart';
 import 'package:arbor/views/verify_email_view.dart';
@@ -12,13 +15,16 @@ void main() {
    MaterialApp(
      title: 'Arbor',
      theme: ThemeData(
-       primaryColor: Colors.green,
+       primaryColor: Colors.blue,
      ),
      home: const HomePage(),
      routes: {
-       '/login/':(context) => LoginView(),
-       '/register/':(context) => RegisterView(),
-       '/verify-email-view/':(context) => VerifyEmailView(),
+       '/login/':(context) => const LoginView(),
+       '/register/':(context) => const RegisterView(),
+       '/verify-email-view/':(context) => const VerifyEmailView(),
+       '/public/':(context) => const PublicView(),
+       '/admin/':(context) => const AdminView(),
+       '/master/':(context) => const MasterView(),
      },
    )
   );
@@ -40,9 +46,8 @@ class HomePage extends StatelessWidget {
                 if(user != null){
                   
                   if(user.emailVerified){
-                     //devtools.log('email varified');
-                     //return const LoginView();
-                     print('Email is verified');
+                     //devtools.log('email verified');
+                     return const PublicView();
                    }else{
                      return const VerifyEmailView();
                    }
@@ -50,7 +55,6 @@ class HomePage extends StatelessWidget {
                     return const LoginView();
                 }
                
-               return const Text('Done');  
                default:
                   return const CircularProgressIndicator();
           }

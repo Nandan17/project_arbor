@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({ Key? key }) : super(key: key);
@@ -25,6 +26,9 @@ class _LoginViewState extends State<LoginView> {
     _password.dispose();
     super.dispose();
   }
+
+ List<String> items = <String>['admin','master','public'];
+ String selectedItem = 'admin';
 
   @override
   Widget build(BuildContext context) {
@@ -52,21 +56,67 @@ class _LoginViewState extends State<LoginView> {
               hintText: 'password'
             ),
           ),
+          DropdownButton<String>(
+            //hint: const Text('Select one'),
+            value: selectedItem,
+            items: items.map((String item) => DropdownMenuItem<String>(
+                   value: item,
+                   child: Text(item)
+                  ),
+                  ).toList(),
+              onChanged: (item) => setState(() {
+                selectedItem = item!;
+              }),
+          ),
           TextButton(
             onPressed: () async {
              final email = _email.text;
-            final password = _password.text;
+             final password = _password.text;
 
             try{
-              await FirebaseAuth.instance.signInWithEmailAndPassword(
+              final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
               email: email, 
               password: password,
               );
+
+              devtools.log(userCredential.toString());
+              final user = FirebaseAuth.instance.currentUser;
+              if(user?.emailVerified ?? false){
+                //if users email is varified
+                devtools.log(selectedItem.toString());
+                if(selectedItem == 'admin'){
+                  Navigator.of(context)
+                .pushNamedAndRemoveUntil(
+                '/admin/',
+                (route) => false,);
+                }else if(selectedItem == 'master'){
+                  Navigator.of(context)
+                .pushNamedAndRemoveUntil(
+                '/master/',
+                (route) => false,);
+                }else if(selectedItem == 'public'){
+                  Navigator.of(context)
+                .pushNamedAndRemoveUntil(
+                '/public/',
+                (route) => false,);
+                }else{
+                  devtools.log('Please select one item');
+                }
+                
+              }else{
+                //if users email is not varified
+                Navigator.of(context)
+                .pushNamedAndRemoveUntil(
+                '/verify-email-view/',
+                (route) => false,
+                );
+              }
+
             } on FirebaseAuthException catch(e){
               if(e.code == 'user-not-found'){
-                print('User not found');
+                devtools.log('User not found');
               } else if(e.code == 'wrong-password'){
-                print('wrong password');
+                devtools.log('wrong password');
               } 
             }
           },
