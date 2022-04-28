@@ -12,10 +12,10 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Varify the email'),),
+      appBar: AppBar(title: const Text('Verify the email'),),
       body: Column(
         children: [
-          const Text('We\'ve sent to you an email varification. Please oprn it to varify your account'),
+          const Text('We\'ve sent to you an email varification. Please oprn it to verify your account'),
           const Text('If you haven\'t received a varification email yet, press the button below'),
           TextButton(
             onPressed: () async {
@@ -25,8 +25,8 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               child:const Text('Send email varification'),
            ),
             TextButton(
-             onPressed: () {
-               //await FirebaseAuth.instance.logout();
+             onPressed: () async{
+               await FirebaseAuth.instance.signOut();
                Navigator.of(context).pushNamedAndRemoveUntil(
                  '/register/',
                  (route) => false,
