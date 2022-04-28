@@ -1,3 +1,5 @@
+import 'package:arbor/views/dropdown/expandedListAnimationWidget.dart';
+import 'package:arbor/views/dropdown/scrollbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
@@ -27,8 +29,12 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
- List<String> items = <String>['admin','master','public'];
- String selectedItem = 'admin';
+//  List<String> items = <String>['admin','master','public'];
+//  String selectedItem = 'admin';
+  List <String> _list =["admin","master","public"];
+  bool isStrechedDropDown = false;
+  int groupValue = 0;
+  String title = 'Login as';
 
   @override
   Widget build(BuildContext context) {
@@ -149,21 +155,95 @@ class _LoginViewState extends State<LoginView> {
 	                      ],
 	                    ),
 	                  ),
-                    Container(
-                      padding: EdgeInsets.all(8.0),
-                      child: DropdownButton<String>(
-                      hint: const Text('Select one'),
-                      //value: selectedItem,
-                      items: items.map((String item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(item)
-                        ),
-                      ).toList(),
-                      onChanged: (item) => setState(() {
-                      selectedItem = item!;
-                      }),
+                    //DropdownButton
+                    SafeArea(
+                      child: Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Color.fromARGB(220, 220, 220, 220)),
+                                    borderRadius: BorderRadius.all(Radius.circular(27))
+                                    ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                        // height: 45,
+                                        width: double.infinity,
+                                        padding: EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(color: Color.fromARGB(220, 220, 220, 220),),
+                                            borderRadius:BorderRadius.all(Radius.circular(25))
+                                            ),
+                                        constraints: BoxConstraints(
+                                          minHeight: 45,
+                                          minWidth: double.infinity,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(
+                                                    horizontal: 20, vertical: 10,),
+                                                child: Text(
+                                                title,
+                                                ),
+                                              ),
+                                            ),
+                                           
+                                            GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isStrechedDropDown =
+                                                        !isStrechedDropDown;
+                                                  });
+                                                },
+                                                child: Icon(isStrechedDropDown
+                                                    ? Icons.arrow_upward
+                                                    : Icons.arrow_downward))
+                                          ],
+                                        )),
+                                    ExpandedSection(
+                                      expand: isStrechedDropDown,
+                                      height: 100,
+                                      child: MyScrollbar(
+                                        builder: (context, scrollController2) =>
+                                            ListView.builder(
+                                                padding: EdgeInsets.all(0),
+                                                controller: scrollController2,
+                                                shrinkWrap: true,
+                                                itemCount: _list.length,
+                                                itemBuilder: (context, index) {
+                                                  return RadioListTile(
+                                                    title: Text(_list.elementAt(index)),
+                                                      value: index,
+                                                      groupValue: groupValue,
+                                                      onChanged: (val) {
+                                                      setState(() {
+                                                      groupValue = val as int;
+                                                      title = _list.elementAt(index);
+                                                      });
+                                                      });
+                                                }),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )),
+                            ],
+                          )
+                        ],
                       ),
                     ),
+
+
+
                     SizedBox(height: 30,),
                     Container(
                       height: 50,
@@ -191,18 +271,18 @@ class _LoginViewState extends State<LoginView> {
                           final user = FirebaseAuth.instance.currentUser;
                           if(user?.emailVerified ?? false){
                             //if users email is varified
-                            devtools.log(selectedItem.toString());
-                            if(selectedItem == 'admin'){
+                            devtools.log(groupValue.toString());
+                            if(groupValue == 0){
                               Navigator.of(context)
                             .pushNamedAndRemoveUntil(
                             '/admin/',
                             (route) => false,);
-                            }else if(selectedItem == 'master'){
+                            }else if(groupValue == 1){
                               Navigator.of(context)
                             .pushNamedAndRemoveUntil(
                             '/master/',
                             (route) => false,);
-                            }else if(selectedItem == 'public'){
+                            }else if(groupValue == 2){
                               Navigator.of(context)
                             .pushNamedAndRemoveUntil(
                             '/public/',
